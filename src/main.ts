@@ -5,7 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 //import * as cookieParser from 'cookie-parser';
 
 import { NestExpressApplication } from '@nestjs/platform-express';
-import * as Sentry from '@sentry/node';
+//import * as Sentry from '@sentry/node';
 //import helmet from 'helmet';
 import { SentryFilter } from 'src/commons/filters/sentry.filter';
 import { configLoaderHelper } from 'src/commons/helpers/config-loader.helper';
@@ -29,9 +29,9 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
   });
 
-  Sentry.init({
+  /*  Sentry.init({
     dsn: configLoaderHelper().sentry.dns,
-  });
+  }); */
 
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new SentryFilter(httpAdapter));
