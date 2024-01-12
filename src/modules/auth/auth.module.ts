@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { configLoaderHelper } from 'src/commons/helpers/config-loader.helper';
 import { AuthController } from 'src/modules/auth//controllers/auth.controller';
 import { AuthService } from 'src/modules/auth//services/auth.service';
 import { ChurchStrategy } from 'src/modules/auth/strategies/church.strategy';
 import { JwtStrategy } from 'src/modules/auth/strategies/jwt.strategy';
 import { LocalStrategy } from 'src/modules/auth/strategies/local.strategy';
+import { LoggerService } from 'src/modules/logger/services/logger.service';
 import { PersonsModule } from 'src/modules/persons/persons.module';
-import { configLoaderHelper } from 'src/shared/helpers/config-loader.helper';
-import { LoggerService } from 'src/shared/modules/logger/services/logger.service';
-import { PrismaService } from 'src/shared/modules/prisma/services/prisma.service';
+import { PrismaService } from 'src/modules/prisma/services/prisma.service';
 
 @Module({
   imports: [

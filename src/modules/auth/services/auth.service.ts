@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
+import {
+/* ResultAccessPermit, */ IUserResponse,
+} from 'src/commons/interfaces';
 import { PersonsService } from 'src/modules/persons/services/persons.service';
-import { ResultAccessPermit, UserResponseType } from 'src/shared/@types';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +30,7 @@ export class AuthService {
     return null;
   }
 
-  async login(user: UserResponseType, actTFA = false) {
+  async login(user: IUserResponse, actTFA = false) {
     const payload = { email: user.email, sub: user.id, churchId: user.churhId };
     const access_token = this.jwtService.sign(payload);
     return {
@@ -39,8 +41,8 @@ export class AuthService {
     };
   }
 
-  async verifyPlatformAccess(user: UserResponseType, app: string) {
-    let result: ResultAccessPermit = null;
+  // async verifyPlatformAccess(user: IUserResponse, app: string) {
+  /*  let result: ResultAccessPermit = null;
     switch (app) {
       case 'ead':
         result = {
@@ -76,9 +78,9 @@ export class AuthService {
         break;
       default:
         break;
-    }
-    return result;
-  }
+    } */
+  // return result;
+  // }
 
   async unlock(data: { personId: string; password: string }) {
     return this.personsService.verifyPasswordToUnlock(

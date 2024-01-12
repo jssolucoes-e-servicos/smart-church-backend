@@ -9,12 +9,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthControllerTag } from 'src/commons/decorators/auth-controller-tag.decorator';
+import routes from 'src/commons/routes';
 import { JwtAuthGuard } from 'src/modules/auth/guard/jwt-auth.guard';
 import { findWithNameType } from 'src/modules/persons/@types/person';
 import { PersonsCreateDTO } from 'src/modules/persons/dto/persons.create.dto';
 import { PersonsUpdateDTO } from 'src/modules/persons/dto/persons.update.dto';
 import { PersonsService } from 'src/modules/persons/services/persons.service';
-import routes from 'src/shared/routes';
 
 @AuthControllerTag('Persons', routes.persons)
 export class PersonsController {

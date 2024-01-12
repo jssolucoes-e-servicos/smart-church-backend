@@ -1,8 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
-
-
+import { IStringValidator } from 'src/commons/interfaces';
 
 export function StringValidator({
   fieldName,

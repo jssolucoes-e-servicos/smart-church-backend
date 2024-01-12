@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { Strategy } from 'passport-custom';
 import { AuthService } from 'src/modules/auth/services/auth.service';
-import { LoggerService } from 'src/shared/modules/logger/services/logger.service';
+import { LoggerService } from 'src/modules/logger/services/logger.service';
 
 @Injectable()
 export class ChurchStrategy extends PassportStrategy(Strategy, 'church') {
@@ -14,6 +14,7 @@ export class ChurchStrategy extends PassportStrategy(Strategy, 'church') {
     super();
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   async validate(req: Request): Promise<any> {
     const { username, password, churchId } = req.body;
     const user = await this._authService.validateUser(

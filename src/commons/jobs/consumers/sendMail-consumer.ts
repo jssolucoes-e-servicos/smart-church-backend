@@ -7,7 +7,7 @@ import {
   Processor,
 } from '@nestjs/bull';
 import { Job } from 'bull';
-import { LoggerService } from 'src/shared/modules/logger/services/logger.service';
+import { LoggerService } from 'src/modules/logger/services/logger.service';
 
 type DataUser = {
   name: string;
@@ -20,6 +20,7 @@ type MailData = {
   subject: string;
   text?: string | null;
   template?: string | null;
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   data?: any | null;
 };
 
@@ -27,11 +28,10 @@ type MailData = {
 export class SendMailConsumer {
   constructor(
     private readonly _logger: LoggerService,
-    private _mailService: MailerService
-    ) {}
+    private _mailService: MailerService,
+  ) {}
   private collection = 'sendMail';
   private cacher = 'sendMail-queue';
-
 
   async sendMail(mailData: MailData) {
     try {
@@ -42,8 +42,13 @@ export class SendMailConsumer {
         text: mailData.text,
       });
     } catch (error) {
+      // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
       let message;
-      (error instanceof Error) ? message = error.message : message = String(error);
+      error instanceof Error
+        ? // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
+          (message = error.message)
+        : // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
+          (message = String(error));
       this._logger.setError(this.cacher, message);
     }
   }
@@ -62,16 +67,16 @@ export class SendMailConsumer {
 
   @OnQueueCompleted()
   onComleted(job: Job) {
-    this._logger.setLog(this.cacher , `On Completed ${job.name}`);
+    this._logger.setLog(this.cacher, `On Completed ${job.name}`);
   }
 
   @OnQueueProgress()
   onProgress(job: Job) {
-    this._logger.setLog(this.cacher , `On Progress ${job.name}`);
+    this._logger.setLog(this.cacher, `On Progress ${job.name}`);
   }
 
   @OnQueueActive()
   onActive(job: Job) {
-   this._logger.setLog(this.cacher , `On Active ${job.name}`);
+    this._logger.setLog(this.cacher, `On Active ${job.name}`);
   }
 }

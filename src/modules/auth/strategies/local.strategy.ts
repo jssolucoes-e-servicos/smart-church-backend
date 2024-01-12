@@ -12,13 +12,14 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   async validate(username: string, password: string): Promise<any> {
     console.log('enter here');
 
     const user = await this.authService.validateUser(
       username,
       password,
-      ''
+      'viva',
     );
     if (!user) {
       console.log(`attempt error: { username: ${username} }`);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Body,
   Controller,
@@ -7,12 +8,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { IRequestWithUser } from 'src/commons/interfaces';
+import routes from 'src/commons/routes';
 import { AuthDTO } from 'src/modules/auth/dto/auth.dto';
 import { ChurchAuthGuard } from 'src/modules/auth/guard/church-auth.guard';
 import { JwtAuthGuard } from 'src/modules/auth/guard/jwt-auth.guard';
 import { AuthService } from 'src/modules/auth/services/auth.service';
-import { RequestWithUserType } from 'src/shared/@types';
-import routes from 'src/shared/routes';
 
 @ApiTags('Auth')
 @Controller(routes.auth)
@@ -22,7 +23,10 @@ export class AuthController {
   @Post('login')
   @ApiSecurity('jwt')
   @UseGuards(ChurchAuthGuard)
-  async loginWithOrigin(@Request() req: RequestWithUserType, @Body() data: AuthDTO) {
+  async loginWithOrigin(
+    @Request() req: IRequestWithUser,
+    @Body() data: AuthDTO,
+  ) {
     const { app = null } = req.body;
     //Reject access in recovery
     if (app === null) {
@@ -37,16 +41,16 @@ export class AuthController {
       );
     }
     //Reject access in recovery
-    if (req.user.loginStats !== 'CHECKED') {
+    /*  if (req.user.loginStats !== 'CHECKED') {
       throw new ForbiddenException(
         `${req.user.name}, seu acesso a plataforma não está liberado, procure o administrador de sua instituição.`,
       );
     }
-
-    const permitAccess = await this.authService.verifyPlatformAccess(
+ */
+    /* const permitAccess = await this.authService.verifyPlatformAccess(
       req.user,
       app,
-    );
+    ); */
 
     /*  let ipClient =
       req.connection.remoteAddress ||
@@ -63,16 +67,16 @@ export class AuthController {
       app: app,
     }; */
 
-    if (permitAccess.permit === false) {
-      throw new ForbiddenException(permitAccess.message);
-    } else {
-      return this.authService.login(req.user);
-    }
+    //if (permitAccess.permit === false) {
+    //  throw new ForbiddenException(permitAccess.message);
+    //} else {
+    return this.authService.login(req.user);
+    // }
   }
 
   @Post('unlock')
   @UseGuards(JwtAuthGuard)
-  async unlock(@Body() data: {personId: string, password: string}){
-      return await this.authService.unlock(data);
+  async unlock(@Body() data: { personId: string; password: string }) {
+    return await this.authService.unlock(data);
   }
 }
