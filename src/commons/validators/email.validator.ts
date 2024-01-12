@@ -1,14 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
-
-interface IValidatorType {
-  fieldName: string;
-  label?: string;
-  optional?: boolean;
-  description?: string;
-  exemple?: string;
-}
+import { IEmailValidator } from 'src/commons/interfaces';
 
 export function EmailValidator({
   fieldName,
@@ -16,7 +9,7 @@ export function EmailValidator({
   optional = false,
   description,
   exemple,
-}: IValidatorType) {
+}: IEmailValidator) {
   if (label === undefined) label = fieldName;
 
   if (optional === true) {

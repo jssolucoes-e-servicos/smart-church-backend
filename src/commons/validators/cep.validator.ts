@@ -1,14 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsPostalCode } from 'class-validator';
-
-interface IValidatorType {
-  fieldName: string;
-  label?: string;
-  optional?: boolean;
-  description?: string;
-  exemple?: string;
-}
+import { ICepValidator } from 'src/commons/interfaces';
 
 export function CepValidator({
   fieldName,
@@ -16,7 +9,7 @@ export function CepValidator({
   optional = false,
   description,
   exemple,
-}: IValidatorType) {
+}: ICepValidator) {
   if (label === undefined) label = fieldName;
   if (optional === true) {
     return applyDecorators(

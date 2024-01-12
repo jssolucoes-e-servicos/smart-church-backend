@@ -1,20 +1,14 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsNotEmpty, IsOptional } from 'class-validator';
-
-interface IValidatorType {
-  fieldName: string;
-  label?: string;
-  optional?: boolean;
-  description?: string;
-}
+import { IBooleanValidator } from 'src/commons/interfaces';
 
 export function BooleanValidator({
   fieldName,
   label,
   optional = false,
   description,
-}: IValidatorType) {
+}: IBooleanValidator) {
   if (label === undefined) label = fieldName;
 
   if (optional === true) {

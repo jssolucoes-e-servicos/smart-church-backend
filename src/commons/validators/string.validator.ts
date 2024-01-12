@@ -2,14 +2,7 @@ import { applyDecorators } from '@nestjs/common';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 
-interface IValidatorType {
-  fieldName: string;
-  label?: string;
-  minLength?: number;
-  optional?: boolean;
-  description?: string;
-  exemple?: string;
-}
+
 
 export function StringValidator({
   fieldName,
@@ -18,7 +11,7 @@ export function StringValidator({
   optional = false,
   description,
   exemple = '',
-}: IValidatorType) {
+}: IStringValidator) {
   if (label === undefined) label = fieldName;
 
   if (description === undefined) description = label;

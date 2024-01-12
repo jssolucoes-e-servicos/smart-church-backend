@@ -1,0 +1,7 @@
+export enum EvaluationStapEnum {
+  NEW= 'NEW',
+  IN_PROGRESS= 'IN_PROGRESS',
+  CONCLUDED= 'CONCLUDED',
+  SUSPENSE= 'SUSPENSE',
+  EXPIRED= 'EXPIRED',
+};

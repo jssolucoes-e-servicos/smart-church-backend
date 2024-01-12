@@ -1,11 +1,336 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL_PRISMA")
+}
+
+enum MaritalStatusEnum {
+  single
+  married
+  separate
+  divorced
+  widow
+}
+
+enum GenreEnum {
+  f
+  m
+}
+
+enum AddressTypeEnum {
+  residential
+  comercial
+  other
+}
+
+enum LoginStatsEnum {
+  unchecked
+  cheked
+  unlocked
+  locked
+  in_recovery
+}
+
+enum CellOrMeetMethodEnum {
+  hibrid
+  online
+  in_person
+}
+
+enum WeekDayEnum {
+  monday
+  tuesday
+  wednesday
+  thursday
+  friday
+  saturday
+  sunday
+}
+
+type IbgeCodesType {
+  city  String?
+  state String?
+}
+
+type AddressType {
+  type         AddressTypeEnum?
+  inLine       String?
+  cep          String?
+  street       String?
+  number       String?          @default("SEM NUMERO")
+  complement   String?
+  neighborhood String?
+  city         String?
+  state        String?          @default("RS")
+  ibgeCodes    IbgeCodesType?
+  location     LocationType?
+  active       Boolean?         @default(true)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime
+}
+
+type LocationType {
+  lat String?
+  lng String?
+}
+
+model Church {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  fantasy       String?
+  cnpj          String         @unique
+  ie            String         @default("ISENTO")
+  email         String?        @unique
+  phone         String?
+  shepherd      String
+  image         String?
+  address       AddressType?
+  isThirst      Boolean?
+  active        Boolean?       @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  persons       Person[]
+  files         File[]
+  networks      CellsNetwork[]
+  cells         Cell[]
+  cellsMeetings CellMeeting[]
+
+  @@index([phone, shepherd, cnpj, email, createdAt(sort: Desc)])
+  @@map("churches")
+}
+
+model Person {
+  id                            String                       @id @default(auto()) @map("_id") @db.ObjectId
+  name                          String
+  genre                         GenreEnum?                   @default(f)
+  maritalStatus                 MaritalStatusEnum?           @default(single)
+  birth                         DateTime?
+  photo                         String?
+  email                         String?
+  username                      String?
+  password                      String?
+  loginAttempts                 Int?                         @default(3)
+  loginStats                    LoginStatsEnum?              @default(unchecked)
+  inRecovery                    Boolean?                     @default(false)
+  twoFactorAuthenticationActive Boolean?                     @default(false)
+  church                        Church                       @relation(fields: [churchId], references: [id])
+  member                        Boolean?                     @default(true)
+  memberId                      String?
+  singnedAt                     DateTime?
+  singnedBy                     String?
+  dizimist                      Boolean?                     @default(false)
+  permitChurch                  Boolean?                     @default(false)
+  permitPortal                  Boolean?                     @default(true)
+  twoFactorAuthentication       TwoFactorAuthenticationType?
+  active                        Boolean?                     @default(true)
+  createdAt                     DateTime                     @default(now())
+  updatedAt                     DateTime                     @updatedAt
+  churchId                      String                       @db.ObjectId
+  files                         File[]
+  recoveryTokens                RecoveryToken[]
+  documents                     PersonDocument[]
+  addresses                     PersonAddress[]
+  phones                        PersonPhone[]
+  networks                      CellsNetwork[]
+  cells                         Cell[]
+  cellsMeetings                 CellMeetingParticipant[]
+
+  @@index([loginStats, inRecovery, name, email, genre, birth(sort: Desc), createdAt(sort: Desc)])
+  @@map("persons")
+}
+
+model File {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  size        String?
+  metadata    Json?
+  format      String   @default("pdf")
+  url         String
+  owner       Person   @relation(fields: [personId], references: [id])
+  active      Boolean? @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  personId    String   @db.ObjectId
+  Church      Church?  @relation(fields: [churchId], references: [id])
+  churchId    String?  @db.ObjectId
+
+  @@index([format, name, createdAt(sort: Desc)])
+  @@map("files")
+}
+
+model RecoveryToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  person     Person   @relation(fields: [personId], references: [id])
+  token      String
+  expiration DateTime
+  active     Boolean? @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  personId   String   @db.ObjectId
+
+  @@index([token, expiration(sort: Desc), createdAt(sort: Desc)])
+  @@map("recovery_tokens")
+}
+
+type TwoFactorAuthenticationType {
+  ascii         String?
+  hex           String?
+  base32        String?
+  otpauth_url   String?
+  recoveryCodes RecoveryCodesType
+  activedIn     DateTime          @default(now())
+  active        Boolean?          @default(true)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime
+}
+
+type RecoveryCodesType {
+  codeOne  String
+  codeTwo  String
+  codeThre String
+  codeFour String
+  codeFive String
+}
+
+model PersonDocument {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  person        Person   @relation(fields: [personId], references: [id])
+  documentName  String
+  documentValue String
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  personId      String   @db.ObjectId
+
+  @@index([documentName, documentValue, metadata, createdAt(sort: Desc)])
+  @@map("persons_documents")
+}
+
+model PersonAddress {
+  id        String          @id @default(auto()) @map("_id") @db.ObjectId
+  person    Person          @relation(fields: [personId], references: [id])
+  addrress  AddressType
+  type      AddressTypeEnum @default(residential)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  personId  String          @db.ObjectId
+
+  @@index([createdAt(sort: Desc)])
+  @@map("persons_addresses")
+}
+
+model PersonPhone {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  person      Person   @relation(fields: [personId], references: [id])
+  ddd         Int      @default(55)
+  number      Int
+  operator    String?
+  description String?
+  isWhatsapp  Boolean  @default(false)
+  type        String?  @default("MOBILE")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  personId    String   @db.ObjectId
+
+  @@index([ddd, number, createdAt(sort: Desc)])
+  @@map("persons_phones")
+}
+
+model CellsNetwork {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  church     Church?  @relation(fields: [churchId], references: [id])
+  name       String
+  slug       String?
+  color      String?
+  image      String?
+  supervisor Person   @relation(fields: [personId], references: [id])
+  active     Boolean? @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  churchId   String?  @db.ObjectId
+  personId   String   @db.ObjectId
+  cells      Cell[]
+
+  @@index([name, slug, createdAt(sort: Desc)])
+  @@map("cells_networks")
+}
+
+model Cell {
+  id             String               @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  slug           String?
+  color          String?
+  image          String?
+  day            WeekDayEnum          @default(thursday)
+  hour           String               @default("20:00")
+  method         CellOrMeetMethodEnum @default(hibrid)
+  leader         Person               @relation(fields: [personId], references: [id])
+  host           String?
+  address        AddressType
+  network        CellsNetwork         @relation(fields: [cellsNetworkId], references: [id])
+  active         Boolean?             @default(true)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  personId       String               @db.ObjectId
+  cellsNetworkId String               @db.ObjectId
+  meetings       CellMeeting[]
+  Church         Church?              @relation(fields: [churchId], references: [id])
+  churchId       String?              @db.ObjectId
+
+  @@index([name, slug, day, method, createdAt(sort: Desc)])
+  @@map("cells")
+}
+
+model CellMeeting {
+  id            String                   @id @default(auto()) @map("_id") @db.ObjectId
+  church        Church                   @relation(fields: [churchId], references: [id])
+  cell          Cell                     @relation(fields: [cellId], references: [id])
+  date          DateTime
+  day           WeekDayEnum              @default(thursday)
+  hour          String                   @default("20:00")
+  start         DateTime?
+  final         DateTime?
+  method        CellOrMeetMethodEnum     @default(hibrid)
+  address       AddressType?
+  realized      Boolean?                 @default(false)
+  observation   String?
+  totalPersons  Int?                     @default(0)
+  totalVisitors Int?                     @default(0)
+  totalMembers  Int?                     @default(0)
+  photos        String[]
+  prelector     String?
+  active        Boolean?                 @default(true)
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
+  churchId      String                   @db.ObjectId
+  cellId        String                   @db.ObjectId
+  participants  CellMeetingParticipant[]
+
+  @@index([day, method, createdAt(sort: Desc)])
+  @@map("cells_meetings")
+}
+
+model CellMeetingParticipant {
+  id            String               @id @default(auto()) @map("_id") @db.ObjectId
+  meeting       CellMeeting          @relation(fields: [cellMeetingId], references: [id])
+  registred     Boolean?             @default(false)
+  person        Person?              @relation(fields: [personId], references: [id])
+  name          String
+  phone         String?
+  email         String?
+  reserved      Boolean?             @default(true)
+  confirmed     Boolean?             @default(false)
+  method        CellOrMeetMethodEnum @default(in_person)
+  active        Boolean?             @default(true)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime
+  cellMeetingId String               @db.ObjectId
+  personId      String?              @db.ObjectId
+
+  @@index([method, createdAt(sort: Desc)])
+  @@map("cells_meetings_participants ")
 }

@@ -1,14 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsPhoneNumber } from 'class-validator';
-
-interface IValidatorType {
-  fieldName: string;
-  label?: string;
-  optional?: boolean;
-  description?: string;
-  exemple?: string;
-}
+import { IPhoneValidator } from 'src/commons/interfaces';
 
 export function PhoneValidator({
   fieldName,
@@ -16,7 +9,7 @@ export function PhoneValidator({
   optional = false,
   description,
   exemple = '',
-}: IValidatorType) {
+}: IPhoneValidator) {
   if (label === undefined) label = fieldName;
 
   if (optional === true) {

@@ -1,0 +1,7 @@
+export enum LoginStatsEnum {
+  UNCHECKED = 'UNCHECKED',
+  CHECKED = 'CHECKED',
+  UNLOCKED = 'UNLOCKED',
+  LOCKED = 'LOCKED',
+  IN_RECOVERY = 'IN_RECOVERY',
+}
